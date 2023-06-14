@@ -1,10 +1,16 @@
 # Optical Character Recognition Using PyTorch
 
-This is a simple project that demonstrates how to build an Optical Character Recognition (OCR) model using PyTorch.
+This project provides an implementation of an Optical Character Recognition (OCR) model using PyTorch. We train a Convolutional Neural Network (CNN) to recognize individual characters in natural images.
+
+## Dataset
+
+We make use of the [Chars74K dataset](http://www.ee.surrey.ac.uk/CVSSP/demos/chars74k/), which provides images of individual characters, including variations in scale, and maintaining the original resolution of the characters as they appear in the original images. 
+
+Specifically, we are using the `EnglishFnt.tgz` file, which contains characters from computer fonts with 4 variations (combinations of italic, bold, and normal). This dataset has 62 classes, consisting of digits 0-9, uppercase letters A-Z, and lowercase letters a-z.
 
 ## Task 1: Image Preprocessing
 
-Firstly, we need to preprocess the images before feeding them into the model. The `torchvision.transforms` module contains several transforms that can be chained together using `transforms.Compose`. The transforms we used here include `Resize` to adjust the image size, `RandomHorizontalFlip` for data augmentation, `ToTensor` to convert the images into PyTorch tensors, and `Normalize` to normalize the pixel values.
+The images are preprocessed before feeding them into the model. The preprocessing steps include resizing the images, randomly flipping the images horizontally for data augmentation, converting the images into PyTorch tensors, and normalizing the pixel values.
 
 ```python
 transform = transforms.Compose([
@@ -15,9 +21,9 @@ transform = transforms.Compose([
 ])
 ```
 
-## Task 2: Data Preparation
+## Task 2: Data Loading and Preparation
 
-Secondly, the data is loaded and split into training, validation, and testing sets using the `torchvision.datasets.ImageFolder` and `torch.utils.data.DataLoader` classes.
+We load the dataset and prepare it by splitting into training, validation, and testing sets. 
 
 ```python
 data = torchvision.datasets.ImageFolder(root='./EnglishFnt/English/Fnt', transform=transform)
@@ -26,7 +32,7 @@ train_loader, val_loader, test_loader = load_split(data, batch_size=36, test_spl
 
 ## Task 3: Building a CNN and One-hot-encoding
 
-Then, we define a simple Convolutional Neural Network (CNN) architecture for the OCR model. The model consists of two convolutional layers and a fully connected layer. Since there are 62 classes (10 digits, 26 lowercase letters, and 26 uppercase letters), the output size of the fully connected layer is set to 62.
+We then define a simple Convolutional Neural Network (CNN) architecture for the OCR model. The output size of the fully connected layer is set to 62, corresponding to the 62 classes in our dataset.
 
 ```python
 class OCRNet(nn.Module):
@@ -35,7 +41,7 @@ class OCRNet(nn.Module):
 
 ## Task 4: Set the Optimizer and Loss Functions
 
-The optimizer and loss function are set up as follows. Stochastic Gradient Descent (SGD) is used as the optimizer, and Cross Entropy Loss is used as the loss function, which is suitable for multi-class classification problems.
+Stochastic Gradient Descent (SGD) is used as the optimizer, and Cross Entropy Loss is used as the loss function.
 
 ```python
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
@@ -52,7 +58,7 @@ train(model, train_loader, optimizer, criterion, num_epochs=10)
 
 ## Task 6: Validate the Model
 
-After training, the model is validated using the validation set.
+After training, we validate the model using the validation set.
 
 ```python
 validate(model, val_loader, criterion)
@@ -68,15 +74,11 @@ test(model, test_loader, criterion)
 
 ## Task 8: Saving and Loading the Model
 
-We can save the trained model for later use or further training.
+We can save the trained model for later use or further training. To load the model, we first initialize an instance of the model and then load the parameters.
 
 ```python
 torch.save(model.state_dict(), '/path/to/save/model.pth')
-```
 
-To load the model, we first need to initialize an instance of the model and then load the parameters.
-
-```python
 model = OCRNet(num_features)
 model.load_state_dict(torch.load('/path/to/saved/model.pth'))
 model.eval()  # Set the model to evaluation mode
@@ -97,6 +99,4 @@ predict(model, '/path/to/an/image.png', transform)
 - torchvision
 - PIL
 - numpy
-- matplotlib
-
-For detailed implementation, please refer to the [source code](https://github.com/username/repo).
+- mathplotlab
